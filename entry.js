@@ -35,6 +35,7 @@ const title = van.state("TITLE")
 const task = (state) => {
     const text = van.state(state.text)
     const complete = van.state(!!state.task)
+    
     let MYDIVS = typeof state.task == "object" ? state.task.map(x => task(x)) : null;
     
     return div({class: "task"},
@@ -57,8 +58,6 @@ const progress = () => {
 const toplayer = (state) => {
     let title = van.state(state.title)
     let tasks = van.state(state.task)
-    globalThis["tasks"] = tasks
-    console.log(tasks)
     let tasksElem = tasks.val.map(x => task(x))
     let dom = div({id:"toplayers"},
     input({oninput: (e) => {title.val = e.target.value}, 
