@@ -2,7 +2,7 @@ p {
     margin: 0px;
 }
 :root {
-    --f-size: 20px;
+    --f-size: 16px;
     --pad: 10px;
     --margin: 10px;
 }
@@ -12,6 +12,7 @@ body {
     height: 100%;
     margin: 0px;
     padding: 0px;
+    font-size: var(--f-size);
     font-family: Tahoma;
     background-color: #222;
     color: #fff
@@ -37,12 +38,25 @@ body {
 }
 .task {
     position: relative;
-    
+    background-color: #fff2;
+    padding: var(--pad);
+    margin: var(--margin);
 }
 .bar {
     background-color: #0c0;
     width: 100%;
     min-height: 1em;
+}
+#toplayer {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+#title {
+    position: relative;
+    font-size: calc(var(--f-size) * 2);
+    text-align: center;
+    width: 100%;
 }
 textarea {
     resize: none;
