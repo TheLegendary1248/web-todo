@@ -1,4 +1,5 @@
 import van from "vanjs-core"
-const div = van.tags.div
+import "./style.css"
+const { div, p, span, button } = van.tags
 
-van.add(document.body, div("Hello from VanJS"))
+const task = div()
