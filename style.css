@@ -1,6 +1,10 @@
 p {
     margin: 0px;
 }
+* {
+    box-sizing: border-box;
+    color: #fff;
+}
 :root {
     --f-size: 16px;
     --pad: 10px;
@@ -15,7 +19,6 @@ body {
     font-size: var(--f-size);
     font-family: Tahoma;
     background-color: #222;
-    color: #fff
 }
 #legend {
     border: 2px solid #000;
@@ -41,11 +44,21 @@ body {
     background-color: #fff2;
     padding: var(--pad);
     margin: var(--margin);
+    border-radius: 5px;
 }
 .bar {
+    position: relative;
     background-color: #0c0;
-    width: 100%;
+    width: calc(var(--pad) * 2 + 100%);
+    left: calc(var(--pad) * -1);
+    bottom: calc(var(--pad) * -1);
     min-height: 1em;
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: calc(var(--pad) / 2);
+}
+.bar:only-child {
+    min-height: 0px;
 }
 #toplayer {
     position: absolute;
@@ -65,7 +78,17 @@ textarea {
     color: inherit;
     text-align: center;
     width: 100%;
-    background-color: #222;
+    
     border-radius: 4px;
     border: none;
+}
+textarea, input, button {
+    background-color: #222;
+    border: none;
+}
+button:active {
+    background-color: #522;
+}
+.task > input, .task > button {
+    display: inline;
 }

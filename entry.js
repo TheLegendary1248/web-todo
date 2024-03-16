@@ -37,9 +37,14 @@ const task = (state) => {
     let MYDIVS = typeof state.task == "object" ? state.task.map(x => task(x)) : null;
     
     return div({class: "task"},
+        
         textarea({value: text, oninput: e => {let elem = e.target; text.val = elem.value; elem.style.height = ""; elem.style.height = elem.scrollHeight + 3 + "px"}}),
-        MYDIVS,
+        input({type:"checkbox"}),
+        input({type:"number",placeholder:"weight"}),
+        button("DELETE"),
+        div(MYDIVS,
         progress)
+        )
 }
 const progress = () => {
     return div({class: "bar"}, span("VALUE"))
@@ -48,15 +53,10 @@ const progress = () => {
  * 
  * @param {Array} taskArr 
  */
-const forEachTask = (taskArr) => {
-    taskArr.map(x => task(x))
-}
-const toplayer = (JSONstate) => {
-    const state = reactive(JSONstate)
+const toplayer = (state) => {
+    //const state = reactive(JSONstate)
     let title = van.state(state.title)
-    globalThis["test"] = state
-    console.log(state.task)
-    return div({id:"toplayers"},input({oninput: (e) => {title.val = e.target.value}, value: title, id:"title"}),div(title),
+    return div({id:"toplayers"},input({oninput: (e) => {title.val = e.target.value}, value: title, id:"title"}),
     state.task.map(x => task(x)))
 }
 const set = () => {
