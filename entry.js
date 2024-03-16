@@ -34,6 +34,7 @@ let dummy =
 const title = van.state("TITLE")
 const task = (state) => {
     const text = van.state(state.text)
+    const complete = van.state(!!state.task)
     let MYDIVS = typeof state.task == "object" ? state.task.map(x => task(x)) : null;
     
     return div({class: "task"},
@@ -54,10 +55,17 @@ const progress = () => {
  * @param {Array} taskArr 
  */
 const toplayer = (state) => {
-    //const state = reactive(JSONstate)
     let title = van.state(state.title)
-    return div({id:"toplayers"},input({oninput: (e) => {title.val = e.target.value}, value: title, id:"title"}),
-    state.task.map(x => task(x)))
+    let tasks = van.state(state.task)
+    globalThis["tasks"] = tasks
+    console.log(tasks)
+    return div({id:"toplayers"},
+    input({oninput: (e) => {title.val = e.target.value}, 
+    value: title, id:"title"}),
+    button(
+        {onclick: () => {tasks.val = tasks.val.concat({text:"LOREM< IPSUM", task:false})}},
+        "CREATE"),
+    tasks.val.map(x => task(x)))
 }
 const set = () => {
 
