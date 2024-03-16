@@ -1,9 +1,11 @@
 import van from "vanjs-core"
 import "./style.css"
-const { div, p, span, button,textarea } = van.tags
+const { div, p, span, button,textarea, br} = van.tags
+let outsideUpdate = false
 const task = () => {
+    const text = van.state("")
     return div({class: "task"},
-        p({contentEditable:true}, "TASK"),
+        textarea({value: text, oninput: e => {let elem = e.target; text.val = elem.value; elem.style.height = ""; elem.style.height = elem.scrollHeight + 3 + "px"}}),
         div("NEST"),
         progress)
 }

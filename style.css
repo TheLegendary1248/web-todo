@@ -37,9 +37,17 @@ body {
 }
 .task {
     position: relative;
+    
 }
 .bar {
     background-color: #0c0;
     width: 100%;
     min-height: 1em;
+}
+textarea {
+    resize: none;
+    overflow: hidden;
+    background-color: unset;
+    color: inherit;
+    
 }
