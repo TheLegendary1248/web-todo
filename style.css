@@ -1,6 +1,11 @@
 p {
     margin: 0px;
 }
+:root {
+    --f-size: 20px;
+    --pad: 10px;
+    --margin: 10px;
+}
 body {
     position: absolute;
     width: 100%;
@@ -8,6 +13,8 @@ body {
     margin: 0px;
     padding: 0px;
     font-family: Tahoma;
+    background-color: #222;
+    color: #fff
 }
 #legend {
     border: 2px solid #000;
@@ -20,7 +27,19 @@ body {
 #legend :first-child {
     font-size: 24px;
 }
-textarea {
-    height: fit-content;
-    resize: none;
+#prefs {
+    position: absolute;
+    width: 35vw;
+    min-width: fit-content;
+    padding: var(--pad); 
+    background-color: #444;
+
+}
+.task {
+    position: relative;
+}
+.bar {
+    background-color: #0c0;
+    width: 100%;
+    min-height: 1em;
 }

@@ -22,7 +22,7 @@
   - [ ] A shortcut to switch/toggle Progress Bar number display
   - [ ] A shortcut to move to the top-most Task
   - [ ] A shortcut to create or delete the selected Task
-  - [x] An always visible shortcut legend
+  - [/] An always visible shortcut legend
   - [ ] All functionality should be available without use of a mouse, touch, or otherwise pointing device
 
 - [ ] A Settings / User Preferences Context
@@ -43,4 +43,4 @@
 
 - [ ] Must be hosted on GitHub Pages  
   - You can push as many commits as you want. Ideally, have a `RELEASE` branch that has the final and all previous useable versions. Please [\*\*mark the final version in any way](#footer), if you want to continue working on it for the heck of it
-- [/] Must refer to this GitHub Gist in the README.md 
+- [x] Must refer to this GitHub Gist in the README.md 
