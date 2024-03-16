@@ -59,13 +59,21 @@ const toplayer = (state) => {
     let tasks = van.state(state.task)
     globalThis["tasks"] = tasks
     console.log(tasks)
-    return div({id:"toplayers"},
+    let tasksElem = tasks.val.map(x => task(x))
+    let dom = div({id:"toplayers"},
     input({oninput: (e) => {title.val = e.target.value}, 
     value: title, id:"title"}),
+    tasksElem,
     button(
-        {onclick: () => {tasks.val = tasks.val.concat({text:"LOREM< IPSUM", task:false})}},
+        {onclick: () => 
+            {
+                let taskObj = {text:"LOREM< IPSUM", task:false}
+                tasks.val = tasks.val.concat(task); 
+                van.add(dom, task(taskObj))
+            }},
         "CREATE"),
-    tasks.val.map(x => task(x)))
+    )
+    return dom
 }
 const set = () => {
 
