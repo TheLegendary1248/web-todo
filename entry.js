@@ -34,11 +34,11 @@ let dummy =
 const title = van.state("TITLE")
 const task = (state) => {
     const text = van.state(state.text)
-    console.log(text)
+    let MYDIVS = typeof state.task == "object" ? state.task.map(x => task(x)) : null;
     return div({class: "task"},
         textarea({value: text, oninput: e => {let elem = e.target; text.val = elem.value; elem.style.height = ""; elem.style.height = elem.scrollHeight + 3 + "px"}}),
-        div("NEST"),
-        progress())
+        MYDIVS,
+        progress)
 }
 const progress = () => {
     return div({class: "bar"}, span("VALUE"))
