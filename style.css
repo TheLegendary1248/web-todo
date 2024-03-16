@@ -20,3 +20,7 @@ body {
 #legend :first-child {
     font-size: 24px;
 }
+textarea {
+    height: fit-content;
+    resize: none;
+}
