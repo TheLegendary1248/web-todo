@@ -4,6 +4,7 @@ p {
 * {
     box-sizing: border-box;
     color: #fff;
+    text-align: center;
 }
 :root {
     --f-size: 16px;
@@ -51,16 +52,16 @@ body {
 }
 .bar {
     position: relative;
-    background-color: #0c0;
+    background-color: #050;
     width: calc(var(--pad) * 2 + 100%);
     left: calc(var(--pad) * -1);
     bottom: calc(var(--pad) * -1);
     min-height: 1em;
     border-radius: 5px;
     box-sizing: border-box;
-    padding: calc(var(--pad) / 2);
+    padding: calc(var(--pad) / 4);
 }
-.bar:only-child {
+.bar:not(:only-child)  {
     min-height: 0px;
 }
 #toplayer {

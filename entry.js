@@ -1,7 +1,6 @@
 import van from "vanjs-core"
 import { reactive } from "vanjs-ext"
 import "./style.css"
-const { div, p, input, span, button,textarea} = van.tags
 let dummy = 
 {
     title: "Hello Title",
@@ -31,12 +30,22 @@ let dummy =
         }
     ]
 }
+const { div, p, input, span, button,textarea} = van.tags
 const title = van.state("TITLE")
-const task = (state) => {
+/** Common elements of the TopLayer and TaskElement */
+const TaskContainer = (tasks) => {
+    let nestedtasks = typeof tasks == "object" ? tasks.map(x => TaskElem(x)) : null;
+    return div(
+        nestedtasks,
+        AddTaskToLayerButton,
+        ProgressBar
+    )
+}
+const TaskElem = (state) => {
     const text = van.state(state.text)
-    const complete = van.state(!!state.task)
-    
-    let MYDIVS = typeof state.task == "object" ? state.task.map(x => task(x)) : null;
+    const weight = van.state(1)
+    const t = van.state()
+    let nestedtasks = typeof state.task == "object" ? state.task.map(x => TaskElem(x)) : null;
     
     return div({class: "task"},
         
@@ -44,41 +53,32 @@ const task = (state) => {
         input({type:"checkbox"}),
         input({type:"number",placeholder:"weight"}),
         button("DELETE"),
-        div(MYDIVS,
-        progress)
+        TaskContainer(state.task)
         )
 }
-const progress = () => {
+/** The Bar that shows the completeness of the current parent task */
+const ProgressBar = () => {
     return div({class: "bar"}, span("VALUE"))
 }
-/**
- * 
- * @param {Array} taskArr 
- */
-const toplayer = (state) => {
+const AddTaskToLayerButton = (targetLayer) => {
+    return button({oninput: () => van.add(targetLayer, div("ADDED ME"))}, "+Add Task")
+
+}
+/** @param {Array} taskArr */
+const TopLayer = (state) => {
+    
     let title = van.state(state.title)
     let tasks = van.state(state.task)
-    let tasksElem = tasks.val.map(x => task(x))
-    let dom = div({id:"toplayers"},
-    input({oninput: (e) => {title.val = e.target.value}, 
-    value: title, id:"title"}),
-    tasksElem,
-    button(
-        {onclick: () => 
-            {
-                let taskObj = {text:"LOREM< IPSUM", task:false}
-                tasks.val = tasks.val.concat(task); 
-                van.add(dom, task(taskObj))
-            }},
-        "CREATE"),
+    let dom = 
+    div({id:"toplayers"},
+        input({oninput: (e) => {title.val = e.target.value}, 
+        value: title, id:"title"}),
+        TaskContainer(tasks)
     )
     return dom
-}
-const set = () => {
-
 }
 const fontselect = () => {
     return div("FONT SELECT")
 }
 document.querySelectorAll(".f-sel").forEach(x => van.add(x, fontselect))
-van.add(document.body, toplayer(dummy), prefs)
+van.add(document.body, TaskElem(dummy), prefs)
