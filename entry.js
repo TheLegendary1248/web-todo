@@ -34,46 +34,43 @@ const { div, p, input, span, button,textarea} = van.tags
 const title = van.state("TITLE")
 /** Common elements of the TopLayer and TaskElement */
 const TaskContainer = (tasks) => {
-    let nestedtasks = typeof tasks == "object" ? tasks.map(x => TaskElem(x)) : null;
+    let nestedtasks = div(typeof tasks == "object" ? tasks.map(x => TaskElem(x)) : []);
     return div(
         nestedtasks,
-        AddTaskToLayerButton,
+        AddTaskToLayerButton(nestedtasks),
         ProgressBar
     )
 }
 const TaskElem = (state) => {
     const text = van.state(state.text)
     const weight = van.state(1)
-    const t = van.state()
-    let nestedtasks = typeof state.task == "object" ? state.task.map(x => TaskElem(x)) : null;
-    
-    return div({class: "task"},
+    const deleted = van.state(false)
+    return () => deleted.val ? null : div({class: "task"},
         
         textarea({value: text, oninput: e => {let elem = e.target; text.val = elem.value; elem.style.height = ""; elem.style.height = elem.scrollHeight + 3 + "px"}}),
         input({type:"checkbox"}),
         input({type:"number",placeholder:"weight"}),
-        button("DELETE"),
+        button({onclick: () => {deleted.val = true; console.log("heyo")}}, "DELETE"),
         TaskContainer(state.task)
         )
 }
 /** The Bar that shows the completeness of the current parent task */
 const ProgressBar = () => {
-    return div({class: "bar"}, span("VALUE"))
+    return div({class: "bar"}, span({class: "bar-fg", style: `width: ${100}%`}, "VALUE"))
 }
 const AddTaskToLayerButton = (targetLayer) => {
-    return button({oninput: () => van.add(targetLayer, div("ADDED ME"))}, "+Add Task")
+    return button({onclick: () => van.add(targetLayer, TaskElem({text: "", task: false}))}, "+Add Task")
 
 }
 /** @param {Array} taskArr */
 const TopLayer = (state) => {
-    
     let title = van.state(state.title)
     let tasks = van.state(state.task)
     let dom = 
-    div({id:"toplayers"},
+    div({id:"toplayer"},
         input({oninput: (e) => {title.val = e.target.value}, 
         value: title, id:"title"}),
-        TaskContainer(tasks)
+        TaskContainer(tasks.val)
     )
     return dom
 }
@@ -81,4 +78,4 @@ const fontselect = () => {
     return div("FONT SELECT")
 }
 document.querySelectorAll(".f-sel").forEach(x => van.add(x, fontselect))
-van.add(document.body, TaskElem(dummy), prefs)
+van.add(document.body, TopLayer(dummy), prefs)

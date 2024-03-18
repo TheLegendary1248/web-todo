@@ -61,6 +61,13 @@ body {
     box-sizing: border-box;
     padding: calc(var(--pad) / 4);
 }
+#toplayer > div > .bar {
+    position: fixed;
+    bottom: 0px;
+}
+.bar-fg {
+    /* background-color: #0b0; */
+}
 .bar:not(:only-child)  {
     min-height: 0px;
 }
