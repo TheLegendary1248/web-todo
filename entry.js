@@ -1,5 +1,4 @@
 import van from "vanjs-core"
-import { reactive } from "vanjs-ext"
 import "./style.css"
 let dummy = 
 {
@@ -30,47 +29,60 @@ let dummy =
         }
     ]
 }
-const { div, p, input, span, button,textarea} = van.tags
+const { div, input, span, button,textarea} = van.tags
 const title = van.state("TITLE")
 /** Common elements of the TopLayer and TaskElement */
-const TaskContainer = (tasks) => {
-    let nestedtasks = div(typeof tasks == "object" ? tasks.map(x => TaskElem(x)) : []);
+const TaskContainer = (parentObject) => {
+    let tasks = parentObject.tasks
+    let nestedtasks = div(typeof parentObject == "object" ? parentObject.map(x => TaskElem(x)) : []);
     return div(
         nestedtasks,
-        AddTaskToLayerButton(nestedtasks),
-        ProgressBar
+        AddTaskToLayerButton(nestedtasks, parentObject),
+        ProgressBar()
     )
+}
+const AutoSave = () => {
+    localStorage.setItem("test", JSON.stringify(dummy))
 }
 const TaskElem = (state) => {
     const text = van.state(state.text)
-    const weight = van.state(1)
+    const weight = van.state(state.weight)
     const deleted = van.state(false)
     return () => deleted.val ? null : div({class: "task"},
-        
-        textarea({value: text, oninput: e => {let elem = e.target; text.val = elem.value; elem.style.height = ""; elem.style.height = elem.scrollHeight + 3 + "px"}}),
+        textarea(
+            {placeholder:"Theres no text here", 
+            value: text, 
+            onchange: e => {let elem = e.target; text.val = elem.value; },
+            oninput: e => {let elem = e.target; elem.style.height = ""; elem.style.height = elem.scrollHeight + "px"}
+        }),
         input({type:"checkbox"}),
-        input({type:"number",placeholder:"weight"}),
+        input({type:"number",placeholder:"weight", min: 0, value: weight, oninput: e => weight.val = e.target.value}),
         button({onclick: () => {deleted.val = true; console.log("heyo")}}, "DELETE"),
         TaskContainer(state.task)
         )
 }
 /** The Bar that shows the completeness of the current parent task */
 const ProgressBar = () => {
+
     return div({class: "bar"}, span({class: "bar-fg", style: `width: ${100}%`}, "VALUE"))
 }
-const AddTaskToLayerButton = (targetLayer) => {
-    return button({onclick: () => van.add(targetLayer, TaskElem({text: "", task: false}))}, "+Add Task")
+const AddTaskToLayerButton = (targetLayer, parentObject) => {
+    let obj = {text: "", task: false}
+    return button(
+        {onclick: () => { 
+            //parentObject["task"] = obj; 
+            van.add(targetLayer, TaskElem(obj));}}, 
+        "+Add Task")
 
 }
 /** @param {Array} taskArr */
-const TopLayer = (state) => {
-    let title = van.state(state.title)
-    let tasks = van.state(state.task)
+const TopLayer = (setObject) => {
+    let title = van.state(setObject.title)
     let dom = 
     div({id:"toplayer"},
         input({oninput: (e) => {title.val = e.target.value}, 
         value: title, id:"title"}),
-        TaskContainer(tasks.val)
+        TaskContainer(setObject.task)
     )
     return dom
 }
