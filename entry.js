@@ -29,13 +29,14 @@ let dummy =
         }
     ]
 }
+
 const { div, input, span, button,textarea} = van.tags
 const title = van.state("TITLE")
 /** Common elements of the TopLayer and TaskElement */
 const TaskContainer = (parentObject) => {
     let tasks = parentObject.tasks
-    let nestedtasks = div(typeof parentObject == "object" ? parentObject.map(x => TaskElem(x)) : []);
-    return div(
+    let nestedtasks = div({class: "nested"}, typeof parentObject == "object" ? parentObject.map(x => TaskElem(x)) : []);
+    return div({class: "task-container"},
         nestedtasks,
         AddTaskToLayerButton(nestedtasks, parentObject),
         ProgressBar()
@@ -48,6 +49,12 @@ const TaskElem = (state) => {
     const text = van.state(state.text)
     const weight = van.state(state.weight)
     const deleted = van.state(false)
+    const hasNested = van.state(!(typeof state.task === "boolean"))
+    let leafTaskCtrls = div({class: "leaf-task-ctrls"},
+        input({type:"checkbox"}),
+        input({type:"number",placeholder:"weight", min: 0, value: weight, oninput: e => weight.val = e.target.value}),
+        button({onclick: () => {deleted.val = true; console.log("heyo")}}, "DELETE")
+    )
     return () => deleted.val ? null : div({class: "task"},
         textarea(
             {placeholder:"Theres no text here", 
@@ -55,15 +62,22 @@ const TaskElem = (state) => {
             onchange: e => {let elem = e.target; text.val = elem.value; },
             oninput: e => {let elem = e.target; elem.style.height = ""; elem.style.height = elem.scrollHeight + "px"}
         }),
-        input({type:"checkbox"}),
-        input({type:"number",placeholder:"weight", min: 0, value: weight, oninput: e => weight.val = e.target.value}),
-        button({onclick: () => {deleted.val = true; console.log("heyo")}}, "DELETE"),
+        leafTaskCtrls,
         TaskContainer(state.task)
         )
 }
+/** @param {Array} taskArr */
+const TopLayer = (setObject) => {
+    let title = van.state(setObject.title)
+    let dom = div({id:"toplayer"},
+        input({oninput: (e) => {title.val = e.target.value}, 
+        value: title, id:"title"}),
+        TaskContainer(setObject.task)
+    )
+    return dom
+}
 /** The Bar that shows the completeness of the current parent task */
 const ProgressBar = () => {
-
     return div({class: "bar"}, span({class: "bar-fg", style: `width: ${100}%`}, "VALUE"))
 }
 const AddTaskToLayerButton = (targetLayer, parentObject) => {
@@ -74,17 +88,6 @@ const AddTaskToLayerButton = (targetLayer, parentObject) => {
             van.add(targetLayer, TaskElem(obj));}}, 
         "+Add Task")
 
-}
-/** @param {Array} taskArr */
-const TopLayer = (setObject) => {
-    let title = van.state(setObject.title)
-    let dom = 
-    div({id:"toplayer"},
-        input({oninput: (e) => {title.val = e.target.value}, 
-        value: title, id:"title"}),
-        TaskContainer(setObject.task)
-    )
-    return dom
 }
 const fontselect = () => {
     return div("FONT SELECT")
