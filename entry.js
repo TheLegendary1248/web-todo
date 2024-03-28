@@ -1,8 +1,20 @@
 import van from "vanjs-core"
 import "./style.css"
+/** Form for a Task
+ * @typedef {Object} TaskObj
+ * @property {string} text
+ * @property {number} weight
+ * @property {[TaskObj]} task - Indicator if completed or has nested tasks
+ */
+/** Form for a Set
+ * @typedef {Object} SetObj
+ * @property {string} title 
+ * @property {[TaskObj]} task
+ */
+/** @type {SetObj} */
 let dummy = 
 {
-    title: "Hello Title",
+    title: "Hello World",
     task: [
         {
             text:"Do dishes",
@@ -29,13 +41,12 @@ let dummy =
         }
     ]
 }
-
 const { div, input, span, button,textarea} = van.tags
 const title = van.state("TITLE")
 /** Common elements of the TopLayer and TaskElement */
 const TaskContainer = (parentObject) => {
-    let tasks = parentObject.tasks
-    let nestedtasks = div({class: "nested"}, typeof parentObject == "object" ? parentObject.map(x => TaskElem(x)) : []);
+    let tasks = parentObject.task
+    let nestedtasks = div({class: "nested"}, typeof tasks == "object" ? tasks.map(x => TaskElem(x)) : []);
     return div({class: "task-container"},
         nestedtasks,
         AddTaskToLayerButton(nestedtasks, parentObject),
@@ -45,15 +56,25 @@ const TaskContainer = (parentObject) => {
 const AutoSave = () => {
     localStorage.setItem("test", JSON.stringify(dummy))
 }
-const TaskElem = (state) => {
-    const text = van.state(state.text)
-    const weight = van.state(state.weight)
+const TaskElem = (task) => {
+    const text = van.state(task.text)
+    const weight = van.state(task.weight)
     const deleted = van.state(false)
-    const hasNested = van.state(!(typeof state.task === "boolean"))
+    van.derive(() => {
+        console.log("weight was changed", weight.val)
+        
+        //Logic for recalc here
+    })
+    van.derive(() => {
+        console.log("deleted was changed", deleted.val)
+        if(!deleted.val){
+            //This task was deleted
+        }
+    })
     let leafTaskCtrls = div({class: "leaf-task-ctrls"},
         input({type:"checkbox"}),
         input({type:"number",placeholder:"weight", min: 0, value: weight, oninput: e => weight.val = e.target.value}),
-        button({onclick: () => {deleted.val = true; console.log("heyo")}}, "DELETE")
+        
     )
     return () => deleted.val ? null : div({class: "task"},
         textarea(
@@ -63,7 +84,8 @@ const TaskElem = (state) => {
             oninput: e => {let elem = e.target; elem.style.height = ""; elem.style.height = elem.scrollHeight + "px"}
         }),
         leafTaskCtrls,
-        TaskContainer(state.task)
+        button({onclick: () => {deleted.val = true; console.log("heyo")}}, "DELETE"),
+        TaskContainer(task)
         )
 }
 /** @param {Array} taskArr */
@@ -72,7 +94,7 @@ const TopLayer = (setObject) => {
     let dom = div({id:"toplayer"},
         input({oninput: (e) => {title.val = e.target.value}, 
         value: title, id:"title"}),
-        TaskContainer(setObject.task)
+        TaskContainer(setObject)
     )
     return dom
 }
@@ -84,7 +106,7 @@ const AddTaskToLayerButton = (targetLayer, parentObject) => {
     let obj = {text: "", task: false}
     return button(
         {onclick: () => { 
-            //parentObject["task"] = obj; 
+            parentObject["task"] = obj; 
             van.add(targetLayer, TaskElem(obj));}}, 
         "+Add Task")
 

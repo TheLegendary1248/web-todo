@@ -78,7 +78,7 @@ body {
     padding: calc(var(--pad) / 4);
 }
 #toplayer > div > .bar {
-    position: fixed;
+    position: sticky;
     bottom: 0px;
 }
 .bar-fg {
@@ -89,8 +89,9 @@ body {
 }
 #toplayer {
     position: absolute;
-    height: 100%;
+    height: calc(100% + 200px);
     width: 100%;
+    margin-bottom: 200px;
 }
 #title {
     position: relative;
