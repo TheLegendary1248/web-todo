@@ -44,22 +44,36 @@ let dummy =
 const { div, input, span, button,textarea} = van.tags
 const title = van.state("TITLE")
 /** Common elements of the TopLayer and TaskElement */
-const TaskContainer = (parentObject) => {
+const TaskContainer = (parentObject, total) => {
     let tasks = parentObject.task
-    let nestedtasks = div({class: "nested"}, typeof tasks == "object" ? tasks.map(x => TaskElem(x)) : []);
+    let nestedtasks = div({class: "nested"}, typeof tasks == "object" ? tasks.map(x => TaskElem(x,total)) : []);
     return div({class: "task-container"},
         nestedtasks,
         AddTaskToLayerButton(nestedtasks, parentObject),
-        ProgressBar()
+        ProgressBar(total)
     )
 }
 const AutoSave = () => {
     localStorage.setItem("test", JSON.stringify(dummy))
 }
-const TaskElem = (task) => {
+const TaskDefaults = { weight: 1, text: "", task: false}
+const TaskNestedDefaults = { text: "", task: []}
+const TaskElem = (task, total) => {
+    if(typeof task.task == "boolean" | task.task == undefined) //Ensure object is valid (cuz im stupid myself)
+    {
+        //This funny stuff is here because we want 'task' itself to take precedence
+        //The spread op can't be used alone because we need the ref to task intact
+        Object.assign(task, {...TaskDefaults, ...task}) 
+    }
+    else { // Nested
+        Object.assign(task, {...TaskNestedDefaults, ...task}) 
+    }
     const text = van.state(task.text)
     const weight = van.state(task.weight)
     const deleted = van.state(false)
+    if(task.weight != undefined){
+        total.val += task.weight
+    }
     van.derive(() => {
         console.log("weight was changed", weight.val)
         
@@ -85,22 +99,23 @@ const TaskElem = (task) => {
         }),
         leafTaskCtrls,
         button({onclick: () => {deleted.val = true; console.log("heyo")}}, "DELETE"),
-        TaskContainer(task)
+        TaskContainer(task,total)
         )
 }
 /** @param {Array} taskArr */
 const TopLayer = (setObject) => {
+    let total = van.state(0)
     let title = van.state(setObject.title)
     let dom = div({id:"toplayer"},
         input({oninput: (e) => {title.val = e.target.value}, 
         value: title, id:"title"}),
-        TaskContainer(setObject)
+        TaskContainer(setObject, total)
     )
     return dom
 }
 /** The Bar that shows the completeness of the current parent task */
-const ProgressBar = () => {
-    return div({class: "bar"}, span({class: "bar-fg", style: `width: ${100}%`}, "VALUE"))
+const ProgressBar = (total) => {
+    return div({class: "bar"}, span({class: "bar-fg", style: `width: ${100}%`}, "VALUE + ", total))
 }
 const AddTaskToLayerButton = (targetLayer, parentObject) => {
     let obj = {text: "", task: false}

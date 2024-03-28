@@ -1,11 +1,11 @@
 ## Checklist
 
-- [ ] Must be able create a Task with text content
-  - [ ] be able to delete or edit the Task  
+- [x] Must be able create a Task with text content
+  - [x] be able to delete or edit the Task  
   - [ ] have numerical weight that applies to the Progress Bar calculation
-  - [ ] be able to nest tasks within the Task(like a checklist), which have the same rules above applied 
+  - [x] be able to nest tasks within the Task(like a checklist), which have the same rules above applied 
   to it
-  - [ ] be able to see a Progress Bar for nested Tasks, which has the same rules as the top level Progress Bar applied to it
+  - [x] be able to see a Progress Bar for nested Tasks, which has the same rules as the top level Progress Bar applied to it
 
 - [ ] Be able to see a Progress bar for Tasks
   - [ ] Have a graphic display (loading bar style)  
@@ -15,8 +15,8 @@
   - [ ] At least be able to use one set of [\*opposing keys](#footer) to move between Tasks within the same Task or Set
   - [ ] At least be able to use the other set of [\*opposing keys](#footer) to move into or outside of a Task
   - All important elements should be `Tab`-able
-    - [ ] Tasks
-    - [ ] Any Task modification(create/edit/delete) elements
+    - [x] Tasks
+    - [x] Any Task modification(create/edit/delete) elements
     - [ ] Settings Context
     - [ ] Set Context
   - [ ] A shortcut to switch/toggle Progress Bar number display

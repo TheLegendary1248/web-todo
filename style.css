@@ -78,7 +78,7 @@ body {
     padding: calc(var(--pad) / 4);
 }
 #toplayer > div > .bar {
-    position: sticky;
+    position: fixed;
     bottom: 0px;
 }
 .bar-fg {
@@ -89,9 +89,12 @@ body {
 }
 #toplayer {
     position: absolute;
-    height: calc(100% + 200px);
+    height: calc(100%);    
     width: 100%;
-    margin-bottom: 200px;
+    & > div.task-container > button {
+        position: relative;
+        margin-bottom: 30px;
+    }
 }
 #title {
     position: relative;
