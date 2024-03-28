@@ -12,6 +12,8 @@ import "./style.css"
  * @property {[TaskObj]} task
  */
 /** @type {SetObj} */
+let k = van.state("oh no")
+van.derive(()=>console.log("this shouldn't print", k.oldVal))
 let dummy = 
 {
     title: "Hello World",
@@ -44,13 +46,13 @@ let dummy =
 const { div, input, span, button,textarea} = van.tags
 const title = van.state("TITLE")
 /** Common elements of the TopLayer and TaskElement */
-const TaskContainer = (parentObject, total) => {
+const TaskContainer = (parentObject, total, complete) => {
     let tasks = parentObject.task
-    let nestedtasks = div({class: "nested"}, typeof tasks == "object" ? tasks.map(x => TaskElem(x,total)) : []);
+    let nestedtasks = div({class: "nested"}, typeof tasks == "object" ? tasks.map(x => TaskElem(x,total, complete)) : []);
     return div({class: "task-container"},
         nestedtasks,
-        AddTaskToLayerButton(nestedtasks, parentObject),
-        ProgressBar(total)
+        AddTaskToLayerButton(nestedtasks, parentObject, total, complete),
+        ProgressBar(total, complete)
     )
 }
 const AutoSave = () => {
@@ -75,8 +77,8 @@ const TaskElem = (task, total) => {
         total.val += task.weight
     }
     van.derive(() => {
-        console.log("weight was changed", weight.val)
-        
+        console.log("weight was changed", weight.val, weight.oldVal) //NESTED DO NOT HAVE WEIGHT WHICH WHY NO WORK
+        total.val += weight.val - weight.oldVal
         //Logic for recalc here
     })
     van.derive(() => {
@@ -105,26 +107,27 @@ const TaskElem = (task, total) => {
 /** @param {Array} taskArr */
 const TopLayer = (setObject) => {
     let total = van.state(0)
+    let complete = van.state(0)
     let title = van.state(setObject.title)
     let dom = div({id:"toplayer"},
         input({oninput: (e) => {title.val = e.target.value}, 
         value: title, id:"title"}),
-        TaskContainer(setObject, total)
+        TaskContainer(setObject, total, complete)
     )
+    console.log(setObject)
     return dom
 }
 /** The Bar that shows the completeness of the current parent task */
 const ProgressBar = (total) => {
     return div({class: "bar"}, span({class: "bar-fg", style: `width: ${100}%`}, "VALUE + ", total))
 }
-const AddTaskToLayerButton = (targetLayer, parentObject) => {
+const AddTaskToLayerButton = (targetLayer, parentObject, total, complete) => {
     let obj = {text: "", task: false}
     return button(
         {onclick: () => { 
             parentObject["task"] = obj; 
-            van.add(targetLayer, TaskElem(obj));}}, 
+            van.add(targetLayer, TaskElem(obj, total, complete));}}, 
         "+Add Task")
-
 }
 const fontselect = () => {
     return div("FONT SELECT")
