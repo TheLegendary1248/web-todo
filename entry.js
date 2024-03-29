@@ -12,8 +12,6 @@ import "./style.css"
  * @property {[TaskObj]} task
  */
 /** @type {SetObj} */
-let k = van.state("oh no")
-van.derive(()=>console.log("this shouldn't print", k.oldVal))
 let dummy = 
 {
     title: "Hello World",
@@ -60,28 +58,37 @@ const AutoSave = () => {
 }
 const TaskDefaults = { weight: 1, text: "", task: false}
 const TaskNestedDefaults = { text: "", task: []}
-const TaskElem = (task, total) => {
-    if(typeof task.task == "boolean" | task.task == undefined) //Ensure object is valid (cuz im stupid myself)
-    {
+const TaskElem = (task, total, complete) => {
+    const setNested = () => {
         //This funny stuff is here because we want 'task' itself to take precedence
         //The spread op can't be used alone because we need the ref to task intact
-        Object.assign(task, {...TaskDefaults, ...task}) 
+        Object.assign(task, {...TaskDefaults, ...task})
+        delete task.weight
     }
-    else { // Nested
+    const setLeaf = () => {
         Object.assign(task, {...TaskNestedDefaults, ...task}) 
     }
+    if(typeof task.task == "boolean" | task.task == undefined) 
+        setLeaf()
+    else 
+        setNested()
     const text = van.state(task.text)
-    const weight = van.state(task.weight)
+    const weight = van.state(task.weight ?? 0)
     const deleted = van.state(false)
     if(task.weight != undefined){
         total.val += task.weight
     }
+    let init = true
     van.derive(() => {
+        weight.val
+        if(init) return
         console.log("weight was changed", weight.val, weight.oldVal) //NESTED DO NOT HAVE WEIGHT WHICH WHY NO WORK
         total.val += weight.val - weight.oldVal
         //Logic for recalc here
     })
     van.derive(() => {
+        deleted.val
+        if(init) return
         console.log("deleted was changed", deleted.val)
         if(!deleted.val){
             //This task was deleted
@@ -92,6 +99,7 @@ const TaskElem = (task, total) => {
         input({type:"number",placeholder:"weight", min: 0, value: weight, oninput: e => weight.val = e.target.value}),
         
     )
+    init = false
     return () => deleted.val ? null : div({class: "task"},
         textarea(
             {placeholder:"Theres no text here", 
@@ -100,8 +108,8 @@ const TaskElem = (task, total) => {
             oninput: e => {let elem = e.target; elem.style.height = ""; elem.style.height = elem.scrollHeight + "px"}
         }),
         leafTaskCtrls,
-        button({onclick: () => {deleted.val = true; console.log("heyo")}}, "DELETE"),
-        TaskContainer(task,total)
+        button({onclick: () => {deleted.val = true; console.log("heyo, this shit was deleted")}}, "DELETE"),
+        TaskContainer(task,total,complete)
         )
 }
 /** @param {Array} taskArr */
