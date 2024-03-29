@@ -56,13 +56,13 @@ const TaskContainer = (parentObject, total, complete) => {
 const AutoSave = () => {
     localStorage.setItem("test", JSON.stringify(dummy))
 }
-const TaskDefaults = { weight: 1, text: "", task: false}
+const TaskLeafDefaults = { weight: 1, text: "", task: false}
 const TaskNestedDefaults = { text: "", task: []}
 const TaskElem = (task, total, complete) => {
     const setNested = () => {
         //This funny stuff is here because we want 'task' itself to take precedence
         //The spread op can't be used alone because we need the ref to task intact
-        Object.assign(task, {...TaskDefaults, ...task})
+        Object.assign(task, {...TaskLeafDefaults, ...task})
         delete task.weight
     }
     const setLeaf = () => {
@@ -75,10 +75,17 @@ const TaskElem = (task, total, complete) => {
     const text = van.state(task.text)
     const weight = van.state(task.weight ?? 0)
     const deleted = van.state(false)
+    const innerTotal = van.state(0)
+    const innerComplete = van.state(0)
     if(task.weight != undefined){
         total.val += task.weight
     }
     let init = true
+    van.derive(() => {
+        innerTotal.val
+        if(init) return
+        total.val += innerTotal.val - innerTotal.oldVal
+    })
     van.derive(() => {
         weight.val
         if(init) return
@@ -109,7 +116,7 @@ const TaskElem = (task, total, complete) => {
         }),
         leafTaskCtrls,
         button({onclick: () => {deleted.val = true; console.log("heyo, this shit was deleted")}}, "DELETE"),
-        TaskContainer(task,total,complete)
+        TaskContainer(task,innerTotal,innerComplete)
         )
 }
 /** @param {Array} taskArr */
