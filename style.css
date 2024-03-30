@@ -127,3 +127,20 @@ button:active {
 .task > input, .task > button {
     display: inline;
 }
+#objectrep {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: fit-content;
+    height: fit-content;
+    white-space: pre;
+    font-size: 11px;
+    font-family: monospace;
+    color: #0ff;
+    background-color: #000b;
+    border-radius: 5px;
+    padding: 5px;
+    /* pointer-events: none; */
+    max-height: 90%;
+    overflow-y: scroll;
+}

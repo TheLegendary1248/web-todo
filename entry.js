@@ -41,10 +41,12 @@ let dummy =
         }
     ]
 }
-const { div, input, span, button,textarea} = van.tags
+let  dummyAsString = van.state(JSON.stringify(dummy,  null, "  "))
+const { div, p, input, span, button,textarea} = van.tags
 const title = van.state("TITLE")
 /** Common elements of the TopLayer and TaskElement */
 const TaskContainer = (parentObject, total, complete) => {
+    console.log(parentObject)
     let tasks = parentObject.task
     let nestedtasks = div({class: "nested"}, typeof tasks == "object" ? tasks.map(x => TaskElem(x,total, complete)) : []);
     return div({class: "task-container"},
@@ -54,7 +56,9 @@ const TaskContainer = (parentObject, total, complete) => {
     )
 }
 const AutoSave = () => {
-    localStorage.setItem("test", JSON.stringify(dummy))
+    
+    //localStorage.setItem("test", dummyAsString.val = JSON.stringify(dummy))
+    dummyAsString.val = JSON.stringify(dummy, null, "  ")
 }
 const TaskLeafDefaults = { weight: 1, text: "", task: false}
 const TaskNestedDefaults = { text: "", task: []}
@@ -96,26 +100,32 @@ const TaskElem = (task, total, complete) => {
     van.derive(() => {
         deleted.val
         if(init) return
-        console.log("deleted was changed", deleted.val)
-        if(!deleted.val){
-            //This task was deleted
+        if(deleted.val){
+            console.log("Task was deleted")
+            weight.val = 0
         }
     })
+    van.derive(() => {
+        weight.val; innerTotal.val; deleted.val; text.val;
+        if(init) return
+        AutoSave()
+    })
+    init = false
     let leafTaskCtrls = div({class: "leaf-task-ctrls"},
         input({type:"checkbox"}),
         input({type:"number",placeholder:"weight", min: 0, value: weight, oninput: e => weight.val = e.target.value}),
         
     )
-    init = false
+    
     return () => deleted.val ? null : div({class: "task"},
         textarea(
             {placeholder:"Theres no text here", 
             value: text, 
-            onchange: e => {let elem = e.target; text.val = elem.value; },
+            onchange: e => {let elem = e.target; text.val = elem.value; task.text = elem.value},
             oninput: e => {let elem = e.target; elem.style.height = ""; elem.style.height = elem.scrollHeight + "px"}
         }),
         leafTaskCtrls,
-        button({onclick: () => {deleted.val = true; console.log("heyo, this shit was deleted")}}, "DELETE"),
+        button({onclick: () => deleted.val = true}, "DELETE"),
         TaskContainer(task,innerTotal,innerComplete)
         )
 }
@@ -137,11 +147,13 @@ const ProgressBar = (total) => {
     return div({class: "bar"}, span({class: "bar-fg", style: `width: ${100}%`}, "VALUE + ", total))
 }
 const AddTaskToLayerButton = (targetLayer, parentObject, total, complete) => {
-    let obj = {text: "", task: false}
     return button(
         {onclick: () => { 
-            parentObject["task"] = obj; 
-            van.add(targetLayer, TaskElem(obj, total, complete));}}, 
+            let obj = {text: "", task: false}
+            typeof parentObject.task == "boolean" ? parentObject.task = [obj] : parentObject.task.push(obj); 
+            AutoSave()
+            van.add(targetLayer, TaskElem(obj, total, complete));
+        }}, 
         "+Add Task")
 }
 const fontselect = () => {
@@ -149,3 +161,5 @@ const fontselect = () => {
 }
 document.querySelectorAll(".f-sel").forEach(x => van.add(x, fontselect))
 van.add(document.body, TopLayer(dummy), prefs)
+let objrepUpdateCount = van.state(0)
+van.add(document.body, div({id:"objectrep"}, dummyAsString, ++objrepUpdateCount.val))
