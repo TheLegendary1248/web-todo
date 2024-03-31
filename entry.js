@@ -79,12 +79,13 @@ const TaskElem = (task, total, complete) => {
     const text = van.state(task.text)
     const weight = van.state(task.weight ?? 0)
     const deleted = van.state(false)
-    const innerTotal = van.state(0)
+    const innerTotal = van.state(weight.val)
     const innerComplete = van.state(0)
     if(task.weight != undefined){
         total.val += task.weight
     }
     let init = true
+    //TODO This reactivity is neat and all, but i could use the speedand just spread this out to where they changed individually
     van.derive(() => {
         innerTotal.val
         if(init) return
@@ -112,11 +113,12 @@ const TaskElem = (task, total, complete) => {
     })
     init = false
     let leafTaskCtrls = div({class: "leaf-task-ctrls"},
-        input({type:"checkbox"}),
-        input({type:"number",placeholder:"weight", min: 0, value: weight, oninput: e => weight.val = e.target.value}),
-        
+        input({type:"checkbox", oninput: e => {
+            task.task = e.target.checked; AutoSave(); console.log(task.task)}}),
+        input({type:"number",placeholder:"weight", min: 0, value: weight, oninput: e => {
+            let actualVal = parseFloat(e.target.value); weight.val = task.weight = actualVal; AutoSave()}
+    }), 
     )
-    
     return () => deleted.val ? null : div({class: "task"},
         textarea(
             {placeholder:"Theres no text here", 
