@@ -104,6 +104,7 @@ const TaskElem = (task, total, complete) => {
         if(deleted.val){
             console.log("Task was deleted")
             weight.val = 0
+            
         }
     })
     van.derive(() => {
@@ -137,7 +138,7 @@ const TopLayer = (setObject) => {
     let complete = van.state(0)
     let title = van.state(setObject.title)
     let dom = div({id:"toplayer"},
-        input({oninput: (e) => {title.val = e.target.value}, 
+        input({onchange: (e) => {title.val = e.target.value; setObject.title = title.val; AutoSave()}, 
         value: title, id:"title"}),
         TaskContainer(setObject, total, complete)
     )
